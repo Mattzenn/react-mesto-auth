@@ -10,6 +10,14 @@ import api from '../utils/api'
 import EditProfilePopup from './EditProfilePopup'
 import EditAvatarPopup from './EditAvatarPopup'
 import AddPlacePopup from './AddPlacePopup'
+import { Route, Switch, useHistory } from 'react-router-dom'
+import ProtectedRoute from './ProtectedRoute'
+import Login from './Login'
+import Register from './Rigister'
+import * as auth from '../utils/auth'
+import InfoTooltip from './InfoTooltip'
+import Success from '../images/Success.svg'
+import unSuccess from '../images/unSuccess.svg'
 
 
 function App() {
@@ -20,6 +28,11 @@ function App() {
     const [selectedCard, setSelectedCard] = React.useState(null)
     const [currentUser, setCurrentUser] = React.useState({})
     const [cards, setCards] = React.useState([])
+    const [loggedIn, setLoggedIn] = React.useState(false)
+    const history = useHistory()
+    const [email, setEmail] = React.useState('')
+    const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false)
+    const [message, setMessage] = React.useState({ img: '', text: '' })
 
     React.useEffect(() => {
         api.getApiUserInfo().then((data) => {
@@ -102,14 +115,72 @@ function App() {
         setEditProfilePopupOpen(false)
         setAddPlacePopupOpen(false)
         setSelectedCard(null)
+        setIsInfoTooltipOpen(false)
     }
+
+    React.useEffect(() => {
+        tokenCheck()
+    }, [])
+   
+    function tokenCheck() {
+        const jwt = localStorage.getItem('jwt')
+   
+        if(jwt) {
+          auth.checkToken(jwt)
+            .then((res) => {
+              if(res) {
+                setLoggedIn(true)
+                setEmail(res.data.email)
+                history.push('/')
+              }
+            })
+            .catch((err) => console.log(err))
+        }
+      }
+
+    function handleRegistration(password, email) {
+        auth.register(password, email)
+          .then((result) => {
+            setEmail(result.data.email)
+            setMessage({ img: Success, text: 'Вы успешно зарегистрировались!' })
+            history.push('/sign-in')
+          })
+          .catch(() => setMessage({ img: unSuccess, text: 'Что-то пошло не так! Попробуйте ещё раз.' }))
+          .finally(() => setIsInfoTooltipOpen(true))
+        }
+    
+    function handleAuth(password, email) {
+        auth.authorize(password, email)
+          .then((data) => {
+            setLoggedIn(true)
+            localStorage.setItem('jwt', data.token)
+            history.push('/')
+
+          })
+          .catch((err) => console.log(err))
+        }
+    
+      function onSignOut() {
+        localStorage.removeItem('jwt')
+        setLoggedIn(false)
+      }
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <Header />
-                <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onCardClick={onCardClick} handleCardLike={handleCardLike} handleCardDelete={handleCardDelete} cards={cards} />
+                <Header loggedIn={loggedIn} email={email} onSignOut={onSignOut}/>
+                <Switch>
+                    <ProtectedRoute exact path='/' loggedIn={loggedIn} component={Main} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onCardClick={onCardClick} handleCardLike={handleCardLike} handleCardDelete={handleCardDelete} cards={cards}/>
+                    <Route path='/sign-in'>
+                        <Register isOpen={isEditProfilePopupOpen} onRegister={handleRegistration} isInfoTooltipOpen={isInfoTooltipOpen}/>
+                    </Route>
+                    <Route path='/sign-up'>
+                        <Login isOpen={isEditProfilePopupOpen} onAuth={handleAuth}/>
+                    </Route>
+                </Switch>
                 <Footer />
+
+                <InfoTooltip name='tooltip' isOpen={isInfoTooltipOpen} onClose={closeAllPopups} title={message.text} img={message.img}/>
 
                 <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
 
