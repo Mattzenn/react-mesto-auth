@@ -3,7 +3,6 @@ import React from 'react'
 import Header from './Header'
 import Footer from './Footer'
 import Main from './Main'
-import PopupWithForm from './PopupWithForm'
 import ImagePopup from './ImagePopup'
 import { CurrentUserContext } from '../contexts/CurrentUserContext'
 import api from '../utils/api'
@@ -81,9 +80,11 @@ function App() {
         const isLiked = card.likes.some(i => i._id === currentUser._id);
 
         // Отправляем запрос в API и получаем обновлённые данные карточки
-        api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+        api.changeLikeCardStatus(card._id, !isLiked)
+            .then((newCard) => {
             setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-        });
+        })
+        .catch((err) => console.log(err))
     }
 
     function handleCardDelete(card) {
@@ -119,6 +120,19 @@ function App() {
     }
 
     React.useEffect(() => {
+        const closeByEscape = (e) => {
+          if (e.key === 'Escape') {
+            closeAllPopups();
+          }
+        }
+  
+        document.addEventListener('keydown', closeByEscape)
+        
+        return () => document.removeEventListener('keydown', closeByEscape)
+    }, [])
+  
+
+    React.useEffect(() => {
         tokenCheck()
     }, [])
    
@@ -149,16 +163,16 @@ function App() {
           .finally(() => setIsInfoTooltipOpen(true))
         }
     
-    function handleAuth(password, email) {
-        auth.authorize(password, email)
-          .then((data) => {
-            setLoggedIn(true)
-            localStorage.setItem('jwt', data.token)
-            history.push('/')
-
-          })
-          .catch((err) => console.log(err))
-        }
+        function handleAuth(password, email) {
+            auth.authorize(password, email)
+              .then((data) => {
+                setLoggedIn(true)
+                localStorage.setItem('jwt', data.token)
+                history.push('/')
+                setEmail(email)
+              })
+              .catch((err) => console.log(err))
+            }
     
       function onSignOut() {
         localStorage.removeItem('jwt')

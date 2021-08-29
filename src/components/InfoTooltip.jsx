@@ -1,6 +1,4 @@
-import PopupWithForm from "./PopupWithForm"
-
- export default function InfoTooltip({ isOpen, onClose, title, img }) {
+export default function InfoTooltip({ isOpen, onClose, title, img }) {
    return (
     <div className={`popup ${isOpen ? 'popup_opened' : ''}`}>
     <div className="popup__container popup__overlay">

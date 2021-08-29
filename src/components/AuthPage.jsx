@@ -5,7 +5,7 @@ import React from 'react'
  {children, formName, onSubmit, buttonText, title,}) {
    return (
      <div className='auth-page'>
-         <form className='auth-page__form' noValidate name={formName} onSubmit={onSubmit}>
+         <form className='auth-page__form' name={formName} onSubmit={onSubmit}>
            <h2 className='auth-page__title'>{title}</h2>
              {children}
            <button type="submit" className='auth-page__button'>{buttonText}</button>

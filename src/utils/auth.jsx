@@ -23,7 +23,6 @@ export const authorize = (password, email) => {
         })
         .then(handleResponse)
 }
-
 export const checkToken = (token) => {
     console.log(token)
     return fetch(`${BASE_URL}/users/me`, {
