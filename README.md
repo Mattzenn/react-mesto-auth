@@ -11,7 +11,7 @@
 
 Проект создан с помощью фреймворка React.js.
 
-* [Ссылка на проект](https://mattzenn.github.io/mesto/index.html)
+## [Ссылка на проект](https://mattzenn.github.io/mesto/index.html)
 
 ## Функционал:
 
