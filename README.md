@@ -3,7 +3,7 @@
 ## Создана в рамках учебы в [Яндекс.Практикум](https://praktikum.yandex.ru/) на курсе ["Веб-разработчик"](https://praktikum.yandex.ru/web/).
 
 ### Ссылка на сайт размещенный на сервере: https://mattzenn.nomoredomains.club/
-### Ссылка: на итоговый общий репозиторий frontend и backend: https://github.com/Mattzenn/react-mesto-api-full
+### Ссылка: на итоговый общий репозиторий frontend и backend: https://github.com/Mattzenn/react-mesto-api-full 
 
 ## Описание:
 
